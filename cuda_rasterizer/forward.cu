@@ -399,7 +399,8 @@ renderCUDA(
 			// Avoid numerical instabilities (see paper appendix).
 			float alpha = min(0.99f, nor_o.w * exp(power));
 			if (record_transmittance){
-				atomicAdd(&transmittance[collected_id[j]], T * alpha);
+				// atomicAdd(&transmittance[collected_id[j]], T * alpha);
+				atomicAdd(&transmittance[collected_id[j]], T);
 				atomicAdd(&num_covered_pixels[collected_id[j]], 1);
 			}
 			if (alpha < 1.0f / 255.0f)
