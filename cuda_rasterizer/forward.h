@@ -68,6 +68,8 @@ namespace FORWARD
 		float* out_others,
 		float* transmittance,
 		int* num_covered_pixels,
+		float* transmittance_weighted,
+		float* num_covered_pixels_weighted,
 		bool record_transmittance);
 }
 

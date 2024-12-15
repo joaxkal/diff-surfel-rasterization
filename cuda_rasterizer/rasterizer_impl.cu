@@ -219,6 +219,8 @@ int CudaRasterizer::Rasterizer::forward(
 	float* out_others,
 	float* transmittance,
 	int* num_covered_pixels,
+	float* transmittance_weighted,
+	float* num_covered_pixels_weighted,
 	bool record_transmittance,
 	int* radii,
 	bool debug)
@@ -342,6 +344,8 @@ int CudaRasterizer::Rasterizer::forward(
 		out_others,
 		transmittance,
 		num_covered_pixels,
+		transmittance_weighted,
+		num_covered_pixels_weighted,
 		record_transmittance), debug)
 
 	return num_rendered;

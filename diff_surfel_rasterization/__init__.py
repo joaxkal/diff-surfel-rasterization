@@ -84,16 +84,18 @@ class _RasterizeGaussians(torch.autograd.Function):
         if raster_settings.debug:
             cpu_args = cpu_deep_copy_tuple(args) # Copy them before they can be corrupted
             try:
-                num_rendered, color, depth, radii, geomBuffer, binningBuffer, imgBuffer, transmittance, num_covered_pixels = _C.rasterize_gaussians(*args)
+                num_rendered, color, depth, radii, geomBuffer, binningBuffer, imgBuffer, \
+                    transmittance, num_covered_pixels, transmittance_weighted, num_covered_pixels_weighted = _C.rasterize_gaussians(*args)
             except Exception as ex:
                 torch.save(cpu_args, "snapshot_fw.dump")
                 print("\nAn error occured in forward. Please forward snapshot_fw.dump for debugging.")
                 raise ex
         else:
-            num_rendered, color, depth, radii, geomBuffer, binningBuffer, imgBuffer, transmittance, num_covered_pixels = _C.rasterize_gaussians(*args)
+            num_rendered, color, depth, radii, geomBuffer, binningBuffer, imgBuffer, \
+                transmittance, num_covered_pixels, transmittance_weighted, num_covered_pixels_weighted = _C.rasterize_gaussians(*args)
 
         if raster_settings.record_transmittance:
-            return transmittance, num_covered_pixels, radii
+            return transmittance, num_covered_pixels, transmittance_weighted, num_covered_pixels_weighted, radii
 
         # Keep relevant tensors for backward
         ctx.raster_settings = raster_settings
