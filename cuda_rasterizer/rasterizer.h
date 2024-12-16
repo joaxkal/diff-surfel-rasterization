@@ -54,6 +54,7 @@ namespace CudaRasterizer
 			int* num_covered_pixels,
 			float* transmittance_weighted,
 			float* num_covered_pixels_weighted,
+			float* transmittance_max,
 			bool record_transmittance,
 			int* radii = nullptr,
 			bool debug = false);

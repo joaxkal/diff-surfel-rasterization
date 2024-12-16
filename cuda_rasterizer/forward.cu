@@ -283,6 +283,7 @@ renderCUDA(
 	int* __restrict__ num_covered_pixels,
 	float* __restrict__ transmittance_weighted,
 	float* __restrict__ num_covered_pixels_weighted,
+	float* __restrict__ transmittance_max,
 	bool record_transmittance)
 {
 	// Identify current tile and associated min/max pixel range.
@@ -404,8 +405,9 @@ renderCUDA(
 				// atomicAdd(&transmittance[collected_id[j]], T * alpha);
 				atomicAdd(&transmittance[collected_id[j]], T);
 				atomicAdd(&num_covered_pixels[collected_id[j]], 1);
-				transmittance_weighted[collected_id[j]] = max(transmittance_weighted[collected_id[j]], T);
+				atomicAdd(&transmittance_weighted[collected_id[j]], T*exp(power));
 				atomicAdd(&num_covered_pixels_weighted[collected_id[j]], exp(power));
+				transmittance_max[collected_id[j]] = max(transmittance_max[collected_id[j]], T);
 			}
 			if (alpha < 1.0f / 255.0f)
 				continue;
@@ -494,6 +496,7 @@ void FORWARD::render(
 	int* num_covered_pixels,
 	float* transmittance_weighted,
 	float* num_covered_pixels_weighted,
+	float* transmittance_max,
 	bool record_transmittance)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
@@ -515,6 +518,7 @@ void FORWARD::render(
 		num_covered_pixels,
 		transmittance_weighted,
 		num_covered_pixels_weighted,
+		transmittance_max,
 		record_transmittance);
 }
 

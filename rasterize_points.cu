@@ -36,7 +36,7 @@ std::function<char*(size_t N)> resizeFunctional(torch::Tensor& t) {
 	return lambda;
 }
 
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
@@ -98,6 +98,7 @@ RasterizeGaussiansCUDA(
   torch::Tensor num_occluder = torch::full({P}, 0, int_opts);
   torch::Tensor transmittance_weighted = torch::full({P}, 0.0, float_opts);
   torch::Tensor num_occluder_weighted = torch::full({P}, 0.0, float_opts);
+  torch::Tensor transmittance_max = torch::full({P}, 0.0, float_opts);
 
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
@@ -144,11 +145,12 @@ RasterizeGaussiansCUDA(
 		num_occluder.contiguous().data<int>(),
 		transmittance_weighted.contiguous().data<float>(),
 		num_occluder_weighted.contiguous().data<float>(),
+		transmittance_max.contiguous().data<float>(),
 		record_transmittance,
 		radii.contiguous().data<int>(),
 		debug);
   }
-  return std::make_tuple(rendered, out_color, out_others, radii, geomBuffer, binningBuffer, imgBuffer, transmittance, num_occluder, transmittance_weighted, num_occluder_weighted);
+  return std::make_tuple(rendered, out_color, out_others, radii, geomBuffer, binningBuffer, imgBuffer, transmittance, num_occluder, transmittance_weighted, num_occluder_weighted, transmittance_max);
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
