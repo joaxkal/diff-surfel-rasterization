@@ -15,6 +15,14 @@
 #include <cooperative_groups/reduce.h>
 namespace cg = cooperative_groups;
 
+__device__ __forceinline__ float atomicMaxFloat(float *addr, float value) {
+    float old;
+    old = (value >= 0) 
+        ? __int_as_float(atomicMax((int *)addr, __float_as_int(value))) 
+        : __uint_as_float(atomicMin((unsigned int *)addr, __float_as_uint(value)));
+    return old;
+}
+
 // Forward method for converting the input spherical harmonics
 // coefficients of each Gaussian to a simple RGB color.
 __device__ glm::vec3 computeColorFromSH(int idx, int deg, int max_coeffs, const glm::vec3* means, glm::vec3 campos, const float* shs, bool* clamped)
@@ -407,7 +415,11 @@ renderCUDA(
 				atomicAdd(&num_covered_pixels[collected_id[j]], 1);
 				atomicAdd(&transmittance_weighted[collected_id[j]], T*exp(power));
 				atomicAdd(&num_covered_pixels_weighted[collected_id[j]], exp(power));
-				transmittance_max[collected_id[j]] = max(transmittance_max[collected_id[j]], T);
+				if (exp(power)> 0.5)
+				{
+					atomicMaxFloat(&transmittance_max[collected_id[j]], T);
+				// transmittance_max[collected_id[j]] = max(transmittance_max[collected_id[j]], T);
+				};
 			}
 			if (alpha < 1.0f / 255.0f)
 				continue;
