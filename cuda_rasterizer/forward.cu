@@ -413,12 +413,13 @@ renderCUDA(
 				// atomicAdd(&transmittance[collected_id[j]], T * alpha);
 				atomicAdd(&transmittance[collected_id[j]], T);
 				atomicAdd(&num_covered_pixels[collected_id[j]], 1);
-				atomicAdd(&transmittance_weighted[collected_id[j]], T*exp(power));
-				atomicAdd(&num_covered_pixels_weighted[collected_id[j]], exp(power));
-				if (exp(power)> 0.5)
+				
+				if (exp(power)> 0.05)
 				{
 					atomicMaxFloat(&transmittance_max[collected_id[j]], T);
-				// transmittance_max[collected_id[j]] = max(transmittance_max[collected_id[j]], T);
+					atomicAdd(&transmittance_weighted[collected_id[j]], T*exp(power));
+					atomicAdd(&num_covered_pixels_weighted[collected_id[j]], exp(power));
+					// transmittance_max[collected_id[j]] = max(transmittance_max[collected_id[j]], T);
 				};
 			}
 			if (alpha < 1.0f / 255.0f)
